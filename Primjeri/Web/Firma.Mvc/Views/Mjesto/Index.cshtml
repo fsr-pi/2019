@@ -33,9 +33,13 @@
         </tr>
     </thead>
     <tbody>
+      @{ 
+        ViewDataDictionary vdd = new ViewDataDictionary(this.ViewData);
+        vdd.Add("PagingInfo", Model.PagingInfo);        
+      }
       @foreach (var mjesto in Model.Mjesta)
       {
-        <partial name="Row" model="mjesto" />
+        <partial name="Row" model="mjesto" view-data="vdd" />
       }
     </tbody>
 </table>

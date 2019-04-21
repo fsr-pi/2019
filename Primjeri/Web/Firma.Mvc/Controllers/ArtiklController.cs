@@ -83,7 +83,7 @@ namespace Firma.Mvc.Controllers
                       Usluga = a.ZastUsluga,
                       TekstArtikla = a.TekstArtikla,
                       ImaSliku = a.SlikaArtikla != null,
-                      ImageHash = a.SlikaArtikla != null ? a.SlikaArtikla.Length : 0
+                      ImageHash = a.SlikaChecksum
                     })
                     .Skip((page - 1) * pagesize)
                     .Take(pagesize)
@@ -250,7 +250,7 @@ namespace Firma.Mvc.Controllers
                          Usluga = a.ZastUsluga,
                          TekstArtikla = a.TekstArtikla,
                          ImaSliku = a.SlikaArtikla != null,
-                         ImageHash = a.SlikaArtikla != null ? a.SlikaArtikla.Length : 0
+                         ImageHash = a.SlikaChecksum
                        })
                        .SingleOrDefault();
       if (artikl != null)

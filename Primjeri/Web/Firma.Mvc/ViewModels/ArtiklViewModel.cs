@@ -9,6 +9,6 @@
     public bool Usluga { get; set; }
     public string TekstArtikla { get; set; }
     public bool ImaSliku { get; set; }
-    public int ImageHash { get; set; }
+    public int? ImageHash { get; set; }
   }
 }

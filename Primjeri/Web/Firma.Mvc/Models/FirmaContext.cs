@@ -61,6 +61,8 @@ namespace Firma.Mvc.Models
             .HasMaxLength(255);
 
         entity.Property(e => e.SlikaArtikla).HasColumnType("image");
+
+        entity.Property(e => e.SlikaChecksum).HasComputedColumnSql("(checksum([SlikaArtikla]))");
       });
 
       modelBuilder.Entity<Dokument>(entity =>

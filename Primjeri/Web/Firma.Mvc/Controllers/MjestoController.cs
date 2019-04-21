@@ -249,20 +249,20 @@ namespace Firma.Mvc.Controllers
 
     private void PrepareDropDownLists()
     {
-      var hr = ctx.Drzava                  
-                  .Where(d => d.OznDrzave == "HR")
+      var ba = ctx.Drzava                  
+                  .Where(d => d.OznDrzave == "BA")
                   .Select(d => new { d.NazDrzave, d.OznDrzave })
                   .FirstOrDefault();
       var drzave = ctx.Drzava                      
-                      .Where(d => d.OznDrzave!= "HR")
+                      .Where(d => d.OznDrzave!= "BA")
                       .OrderBy(d => d.NazDrzave)
                       .Select(d => new { d.NazDrzave, d.OznDrzave })
                       .ToList();
-      if (hr != null)
+      if (ba != null)
       {
-        drzave.Insert(0, hr);
+        drzave.Insert(0, ba);
       }      
-      ViewBag.Drzave = new SelectList(drzave, nameof(Drzava.OznDrzave), nameof(Drzava.NazDrzave));
+      ViewBag.Drzave = new SelectList(drzave, nameof(ba.OznDrzave), nameof(ba.NazDrzave));
     }
   }
 }

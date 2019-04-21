@@ -39,6 +39,8 @@ namespace Firma.Mvc.Models
     [Display(Name = "Opis artikla")]
     public string TekstArtikla { get; set; }
 
+    public int? SlikaChecksum { get; set; }
+
     public ICollection<Stavka> Stavka { get; set; }
   }
 }
