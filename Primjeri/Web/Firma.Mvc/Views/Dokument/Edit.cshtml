@@ -89,12 +89,12 @@
 
 
         <div class="col-sm-10">
-            @Html.Partial("Stavke", Model.Stavke)
+          <partial name="Stavke" model="Model.Stavke" />
         </div>
     </form>
 </div>
 
-@await Html.PartialAsync("NovaStavkaTemplate")
+<partial name="NovaStavkaTemplate" />
 
 @section styles{
     <link rel="stylesheet" href="~/lib/jquery-ui/themes/base/jquery-ui.css" />

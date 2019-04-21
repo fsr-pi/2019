@@ -33,11 +33,10 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var mjesto in Model.Mjesta)
-        {
-            @await Html.PartialAsync("Row", mjesto,
-                     new ViewDataDictionary(this.ViewData) { { "PagingInfo", Model.PagingInfo } })
-        }
+      @foreach (var mjesto in Model.Mjesta)
+      {
+        <partial name="Row" model="mjesto" />
+      }
     </tbody>
 </table>
 

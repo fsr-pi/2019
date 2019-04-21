@@ -1,16 +1,24 @@
-﻿namespace Firma.Mvc.Controllers.AutoComplete
+﻿using System.Runtime.Serialization;
+
+namespace Firma.Mvc.Controllers.AutoComplete
 {
-    public class Artikl
+  [DataContract]
+  public class Artikl
+  {
+    [DataMember(Name = "label")]
+    public string Label { get; set; }
+    [DataMember(Name = "id")]
+    public int Id { get; set; }
+    [DataMember(Name = "cijena")]
+    public decimal Cijena { get; set; }
+    public Artikl() { }
+    public Artikl(int id, string label, decimal cijena)
     {
-        public string Label { get; set; }
-        public int Id { get; set; }
-        public decimal Cijena { get; set; }
-        public Artikl() { }
-        public Artikl(int id, string label, decimal cijena)
-        {
-            Id = id;
-            Label = label;
-            Cijena = cijena;
-        }        
+      Id = id;
+      Label = label;
+      Cijena = cijena;
     }
+  }
+
+
 }

@@ -12,7 +12,7 @@
             <a asp-action="Create">Unos novog dokumenta</a>
         </div>       
         <div class="col-sm-7">
-            @Html.Partial("KriterijPretrage", Model.Filter)
+          <partial name="KriterijPretrage" model="Model.Filter" />
         </div>
     </div>
 </div>

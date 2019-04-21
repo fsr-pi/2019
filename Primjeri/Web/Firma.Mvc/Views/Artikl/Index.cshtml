@@ -42,7 +42,7 @@
     <tbody>
         @foreach (var artikl in Model.Artikli)
         {
-            @Html.Partial("Row", artikl)
+          <partial name="Row" model="artikl" />
         }
     </tbody>
 </table>
