@@ -32,11 +32,11 @@ Praktični dio sastoji se od zapisnika s intervjua održanog 27.2.2019., plana p
 5. Web aplikacija 
 	* Isporučuju se u zajedničku mapu grupe. 
 	Mapa će stvoriti nakon što prva osoba iz grupe prihvati zadatak koji se nalazi na 
-	sljedećoj poveznici [bit će objavljeno naknadno]
+	sljedećoj poveznici https://classroom.github.com/g/tm892A4U
 	te pritom stvori grupu s nazivom grupaX (X je broj grupe - provjeriti još jednom koja ste grupa prije unosa!). Ostali prihvaćaju zadatak na istoj poveznici, ali prilikom prihvaćanja umjesto unosa nove grupe odabiru postojeću grupu i pridružuju se.	
 	**Rok za predaju u dogovoru s asistentom u zadnjem ili predzadnjem tjednu nastave**
 	
 6. Programska i korisnička dokumentacija - Rok za predaju: u dogovoru s asistentom
-	* Programska i korisnička dokumentacija isporučuju se u zajedničku mapu grupe. Mapa će se stvoriti nakon što prva osoba iz grupe prihvati zadatak koji se nalazi na sljedećoj poveznici [bit će objavljeno naknadno]
+	* Programska i korisnička dokumentacija isporučuju se u zajedničku mapu grupe. Mapa će se stvoriti nakon što prva osoba iz grupe prihvati zadatak koji se nalazi na sljedećoj poveznici https://classroom.github.com/g/7zdLPFlF
 		te pritom stvori grupu s nazivom grupaX (X je broj grupe). Ostali prihvaćaju zadatak na istoj poveznici, ali prilikom prihvaćanja umjesto unosa nove grupe odabiru postojeću grupu i pridružuju se. Isporučene dokumente možete mijenjati neograničen broj puta do krajnjeg roka.
 
