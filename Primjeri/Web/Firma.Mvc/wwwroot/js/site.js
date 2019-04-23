@@ -11,6 +11,7 @@
     emptyTable: "Nema podataka za prikaz",
     infoEmpty: "Nema podataka za prikaz",
     infoFiltered: "(filtrirano od ukupno _MAX_ zapisa)",
+    zeroRecords: "Ne postoje traženi podaci"
 };
 
 
