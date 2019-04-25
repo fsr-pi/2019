@@ -26,7 +26,7 @@ namespace Firma.Mvc.Controllers
     public IActionResult Index(string filter, int page = 1, int sort = 1, bool ascending = true)
     {
       int pagesize = appData.PageSize;
-      //var sql = "SELECT * FROM vw_partner"; //potrebbon ako se ne zove vw_Partner u FirmaContext
+      //var sql = "SELECT * FROM vw_partner"; //potreban ako se ne zove vw_Partner u FirmaContext
       var query = ctx.vw_Partner
                      .AsNoTracking();
                       //.FromSql(sql);
