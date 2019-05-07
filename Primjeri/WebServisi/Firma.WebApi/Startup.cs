@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using Firma.DAL.Models;
@@ -12,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Firma.WebApi
 {
@@ -40,6 +43,31 @@ namespace Firma.WebApi
       #endregion
 
       services.AddAutoMapper(typeof(Startup));
+
+      #region Swagger setup     
+      services.AddSwaggerGen(c =>
+      {
+        //c.DocInclusionPredicate((name, apidescription) => apidescription.RelativePath.StartsWith($"api"));
+
+        c.SwaggerDoc("v1", new Info
+        {
+          Title = "Firma.Mvc API",
+          Description = "Jednostan primjer Web API-a nad državama",
+          Version = "v1"
+        });
+
+        //Set the comments path for the swagger json and ui.
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        c.IncludeXmlComments(xmlPath);
+
+        //xmlFile = "Firma.Api.Dto.xml";
+        //xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        //c.IncludeXmlComments(xmlPath);
+      });
+
+
+      #endregion
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,6 +77,18 @@ namespace Firma.WebApi
       {
         app.UseDeveloperExceptionPage();
       }
+
+      #region Swagger setup
+      app.UseSwagger();
+
+      // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
+      // specifying the Swagger JSON endpoint.
+      app.UseSwaggerUI(c =>
+      {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Firma.Mvc API V1");
+        c.RoutePrefix = string.Empty;
+      });      
+      #endregion
 
       app.UseStaticFiles();
       app.UseMvc();

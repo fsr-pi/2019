@@ -1,4 +1,6 @@
-﻿using Firma.DataContract.DTOs;
+﻿using AutoMapper;
+using Firma.WebApi.Models;
+using Firma.DataContract.DTOs;
 using Firma.DataContract.QueryHandlers;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -15,15 +17,17 @@ namespace Firma.WebApi.Controllers
   {
     private const string GetDrzavaRouteName = "DohvatiDrzavu"; //potrebno kod CreatedAtRoute    
     private readonly IDrzavaQueryHandler queryHandler;
+    private readonly IMapper mapper;
 
     /// <summary>
     /// Konstruktor
     /// </summary>
     /// <param name="queryHandler">query handler za dohvat država</param>
-    /// <param name="logger">Logger za evidentiranje pogrešaka</param>
-    public DrzavaController(IDrzavaQueryHandler queryHandler)
+    /// <param name="mapper">AutoMapper objekt za preslikavanje među objektima različitih klasa</param>
+    public DrzavaController(IDrzavaQueryHandler queryHandler, IMapper mapper)
     {            
       this.queryHandler = queryHandler;
+      this.mapper = mapper;
     }
 
     // GET: api/drzava
@@ -32,11 +36,15 @@ namespace Firma.WebApi.Controllers
     /// </summary>
     /// <returns>Popis svih država sortiran po nazivu država</returns>
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<DrzavaDto>), (int)HttpStatusCode.OK)]
-    public IEnumerable<DrzavaDto> Get()
+    [ProducesResponseType(typeof(IEnumerable<Drzava>), (int)HttpStatusCode.OK)]
+    public IEnumerable<Drzava> Get()
     {
       var data = queryHandler.Handle(new DataContract.Queries.DrzavaQuery());
-      return data;
+      foreach (var drzava in data)
+      {
+        yield return mapper.Map<DrzavaDto, Drzava>(drzava);
+      }
+      //return data;
     }
 /*
     // GET api/drzava/HR
