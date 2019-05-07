@@ -5,8 +5,11 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
+using CommandQueryCore;
+using Firma.DAL.CommandHandlers;
 using Firma.DAL.Models;
 using Firma.DAL.QueryHandlers;
+using Firma.DataContract.Commands;
 using Firma.DataContract.QueryHandlers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -39,8 +42,12 @@ namespace Firma.WebApi
       #region query handler setup
       //umjesto repetitvnog pisanja može se riješiti refleksijom tražeći i registrirajući sve handlere (klase koje implementiraju neki IQueryHandler<,>)
       //iz typeof(ArtiklQueryHandler).Assembly
+      services.AddTransient<IDrzaveQueryHandler, DrzaveQueryHandler>();
       services.AddTransient<IDrzavaQueryHandler, DrzavaQueryHandler>();
       services.AddTransient<IDrzavaCountQueryHandler, DrzavaCountQueryHandler>();
+      services.AddTransient<ICommandHandler<DeleteDrzava>, DrzavaCommandHandler>();
+      services.AddTransient<ICommandHandler<AddDrzava>, DrzavaCommandHandler>();
+      services.AddTransient<ICommandHandler<UpdateDrzava>, DrzavaCommandHandler>();
       #endregion
 
       services.AddAutoMapper(typeof(Startup));

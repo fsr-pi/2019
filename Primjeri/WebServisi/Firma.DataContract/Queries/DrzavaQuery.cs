@@ -1,17 +1,16 @@
 ﻿using CommandQueryCore;
 using Firma.DataContract.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Firma.DataContract.Queries
 {
-  public class DrzavaQuery : IQuery<IEnumerable<DrzavaDto>>
+  public class DrzavaQuery : IQuery<DrzavaDto>
   {
-    public string SearchText { get; set; }
-    public int From { get; set; }
-    public int Count { get; set; }
-    public SortInfo Sort { get; set; }   
+    public DrzavaQuery(string oznDrzave)
+    {
+      OznDrzave = oznDrzave;
+    }    
+
+    public string OznDrzave { get; set; }   
   }
   
 }

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Firma.DataContract.QueryHandlers
 {
-  public interface IDrzavaQueryHandler : IQueryHandler<DrzavaQuery, DrzavaDto>
+  public interface IDrzaveQueryHandler : IQueryHandler<DrzaveQuery, IEnumerable<DrzavaDto>>
   {
   }
 }

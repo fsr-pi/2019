@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using Firma.WebApi.Models.DataTables;
 using Firma.DataContract.Queries;
 using FCD.Admin.Models.DataTables;
+using CommandQueryCore;
+using Firma.DataContract.Commands;
 
 namespace Firma.WebApi.Controllers
 {
@@ -19,19 +21,29 @@ namespace Firma.WebApi.Controllers
   public class DrzavaController : ControllerBase
   {
     private const string GetDrzavaRouteName = "DohvatiDrzavu"; //potrebno kod CreatedAtRoute    
-    private readonly IDrzavaQueryHandler queryHandler;
+    private readonly IDrzaveQueryHandler drzaveHandler;
+    private readonly IDrzavaQueryHandler drzavaHandler;
     private readonly IDrzavaCountQueryHandler drzavaCountQueryHandler;
+    private readonly ICommandHandler<AddDrzava> addHandler;
+    private readonly ICommandHandler<UpdateDrzava> updateHandler;
+    private readonly ICommandHandler<DeleteDrzava> deleteHandler;
     private readonly IMapper mapper;
 
-    /// <summary>
-    /// Konstruktor
-    /// </summary>
-    /// <param name="queryHandler">query handler za dohvat država</param>
-    /// <param name="mapper">AutoMapper objekt za preslikavanje među objektima različitih klasa</param>
-    public DrzavaController(IDrzavaQueryHandler queryHandler, IDrzavaCountQueryHandler drzavaCountQueryHandler, IMapper mapper)
-    {            
-      this.queryHandler = queryHandler;
+
+    public DrzavaController(IDrzaveQueryHandler drzaveHandler,
+                            IDrzavaQueryHandler drzavaHandler,
+                            IDrzavaCountQueryHandler drzavaCountQueryHandler,
+                            ICommandHandler<AddDrzava> addHandler,
+                            ICommandHandler<UpdateDrzava> updateHandler,
+                            ICommandHandler<DeleteDrzava> deleteHandler,
+                            IMapper mapper)
+    {
+      this.drzaveHandler = drzaveHandler;
+      this.drzavaHandler = drzavaHandler;
       this.drzavaCountQueryHandler = drzavaCountQueryHandler;
+      this.addHandler = addHandler;
+      this.updateHandler = updateHandler;
+      this.deleteHandler = deleteHandler;
       this.mapper = mapper;
     }
 
@@ -40,11 +52,34 @@ namespace Firma.WebApi.Controllers
     /// Postupak za dohvat svih država. 
     /// </summary>
     /// <returns>Popis svih država sortiran po nazivu država</returns>
+    [HttpGet("sve")]
+    [ProducesResponseType(typeof(List<Drzava>), (int)HttpStatusCode.OK)]
+    public async Task<List<Drzava>> GetAll()
+    {
+      var query = new DrzaveQuery();
+      query.Sort = new SortInfo();
+      query.Sort.ColumnOrder.Add(new KeyValuePair<string, SortInfo.Order>(nameof(DrzavaDto.NazDrzave), SortInfo.Order.ASCENDING));
+
+      List<Drzava> list = new List<Drzava>();
+      var data = await drzaveHandler.HandleAsync(query);
+      foreach (var drzava in data)
+      {
+        list.Add(mapper.Map<DrzavaDto, Drzava>(drzava));
+      }
+
+      return list;
+    }
+
+    // GET: api/drzava
+    /// <summary>
+    /// Postupak za dohvat država prilagođenim parametrima za DataTables.net
+    /// </summary>
+    /// <returns>Popis svih država sortiran po nazivu država</returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Drzava>), (int)HttpStatusCode.OK)]
     public async Task<DTResponse> Get(DTRequest request)
     {
-      var query = new DrzavaQuery();
+      var query = new DrzaveQuery();
       if (request.Search != null)
       {
         query.SearchText = request.Search.Value.Trim();
@@ -72,9 +107,9 @@ namespace Firma.WebApi.Controllers
 
       query.From = request.Start;
       query.Count = request.Length;
-     
+
       List<Drzava> list = new List<Drzava>();
-      var data = queryHandler.Handle(query);
+      var data = drzaveHandler.Handle(query);
       foreach (var drzava in data)
       {
         list.Add(mapper.Map<DrzavaDto, Drzava>(drzava));
@@ -90,39 +125,30 @@ namespace Firma.WebApi.Controllers
         draw = request.Draw
       };
 
-      
+
 
       return response;
     }
-/*
+
     // GET api/drzava/HR
     /// <summary>
     /// Postupak za dohvat države čija je oznaka jednaka poslanom parametru
     /// </summary>
     /// <param name="oznDrzave">oznaka države</param>
-    /// <returns>objekt tipa Firma.Api.Dto.Drzava ili NotFound ako država s traženom oznakom ne postoji</returns>
+    /// <returns>objekt tipa Drzava ili NotFound ako država s traženom oznakom ne postoji</returns>
     [HttpGet("{oznDrzave}", Name = GetDrzavaRouteName)]
-    [ProducesResponseType(typeof(Firma.Api.Dto.Drzava), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(Drzava), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public async Task<IActionResult> Get(string oznDrzave)
     {
-      var drzava = await ctx.Drzava
-                            .AsNoTracking()
-                            .Where(d => d.OznDrzave == oznDrzave)
-                            .FirstOrDefaultAsync();
+      var drzava = await drzavaHandler.HandleAsync(new DrzavaQuery(oznDrzave));
       if (drzava == null)
       {
         return NotFound("Tražena država ne postoji");
       }
       else
       {
-        var model = new Firma.Api.Dto.Drzava
-        {
-          SifDrzave = drzava.SifDrzave,
-          OznDrzave = drzava.OznDrzave,
-          Iso3drzave = drzava.Iso3drzave,
-          NazDrzave = drzava.NazDrzave
-        };
+        var model = mapper.Map<DrzavaDto, Drzava>(drzava);
         return Ok(model);
       }
     }
@@ -134,7 +160,7 @@ namespace Firma.WebApi.Controllers
     /// <remarks>
     /// Primjer poziva:
     ///
-    ///     POST /Todo
+    ///     POST /api/drzava
     ///     {    
     ///        "oznDrzave": "A1",
     ///        "nazDrzave" : "Testna država A1",
@@ -149,29 +175,20 @@ namespace Firma.WebApi.Controllers
     [HttpPost]
     [ProducesResponseType((int)HttpStatusCode.Created)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> Create([FromBody] Firma.Api.Dto.Drzava model)
+    public async Task<IActionResult> Create([FromBody] Drzava model)
     {
       if (model != null && ModelState.IsValid)
       {
-        Drzava drzava = new Drzava
-        {
-          SifDrzave = model.SifDrzave,
-          OznDrzave = model.OznDrzave,
-          Iso3drzave = model.Iso3drzave,
-          NazDrzave = model.NazDrzave
-        };
+        AddDrzava addCommand = mapper.Map<Drzava, AddDrzava>(model);
 
         //ovdje bi slijedila validacija u poslovnom sloju prije snimanja (da smo napravili takav sloj)
-        ctx.Add(drzava);
-        await ctx.SaveChangesAsync();
-
-        return CreatedAtRoute(GetDrzavaRouteName, new { oznDrzave = drzava.OznDrzave }, model);
+        await addHandler.HandleAsync(addCommand);
+        return CreatedAtRoute(GetDrzavaRouteName, new { oznDrzave = model.OznDrzave }, model);
       }
       else
       {
         return BadRequest(ModelState);
       }
-
     }
 
     // PUT api/drzava
@@ -185,7 +202,7 @@ namespace Firma.WebApi.Controllers
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> Update(string oznDrzave, [FromBody] Firma.Api.Dto.Drzava model)
+    public async Task<IActionResult> Update(string oznDrzave, [FromBody] Drzava model)
     {
       if (model == null || model.OznDrzave != oznDrzave || !ModelState.IsValid)
       {
@@ -193,21 +210,21 @@ namespace Firma.WebApi.Controllers
       }
       else
       {
-        var drzava = await ctx.Drzava.FindAsync(oznDrzave);
+        var drzava = await drzavaHandler.HandleAsync(new DrzavaQuery(oznDrzave));
         if (drzava == null)
         {
-          return NotFound("Tražena država ne postoji");
+          return NotFound($"Država s oznakom {oznDrzave} ne postoji");
         }
         else
         {
-          drzava.SifDrzave = model.SifDrzave;
-          drzava.Iso3drzave = model.Iso3drzave;
-          drzava.NazDrzave = model.NazDrzave;
-          await ctx.SaveChangesAsync();
+          var updateCommand = mapper.Map<Drzava, UpdateDrzava>(model);
+          //ovdje bi slijedila validacija u poslovnom sloju prije snimanja (da smo napravili takav sloj)
+          await updateHandler.HandleAsync(updateCommand);
           return NoContent();
         };
       }
     }
+
 
     // DELETE api/drzava/HR
     /// <summary>
@@ -221,18 +238,16 @@ namespace Firma.WebApi.Controllers
 
     public async Task<IActionResult> Delete(string oznDrzave)
     {
-      var drzava = await ctx.Drzava.FindAsync(oznDrzave);
+      var drzava = await drzavaHandler.HandleAsync(new DrzavaQuery(oznDrzave));
       if (drzava == null)
       {
-        return NotFound("Tražena država ne postoji");
+        return NotFound($"Država s oznakom {oznDrzave} ne postoji");
       }
       else
       {
-        ctx.Remove(drzava);
-        await ctx.SaveChangesAsync();
+        await deleteHandler.HandleAsync(new DeleteDrzava(oznDrzave));
         return NoContent();
       };
     }
-    */
   }
 }

@@ -23,91 +23,34 @@ namespace Firma.DAL.QueryHandlers
       this.ctx = ctx;
       this.mapper = mapper;
     }
-    public IEnumerable<DrzavaDto> Handle(DrzavaQuery query)
+    public DrzavaDto Handle(DrzavaQuery query)
     {
-      List<DrzavaDto> list = new List<DrzavaDto>();
-      IQueryable<Drzava> dbquery = PrepareDbQuuery(query);
+      var drzava = ctx.Drzava.Find(query.OznDrzave);
 
-      foreach (var drzava in dbquery)
+      if (drzava != null)
       {
         var dto = mapper.Map<Drzava, DrzavaDto>(drzava);
-        list.Add(dto);
+        return dto;
       }
-      return list;
+      else
+      {
+        return null;
+      }     
     }
 
-    public async Task<IEnumerable<DrzavaDto>> HandleAsync(DrzavaQuery query)
+    public async Task<DrzavaDto> HandleAsync(DrzavaQuery query)
     {
-      List<DrzavaDto> list = new List<DrzavaDto>();
-      IQueryable<Drzava> dbquery = PrepareDbQuuery(query);
+      var drzava = await ctx.Drzava.FindAsync(query.OznDrzave);
 
-      await dbquery.ForEachAsync(drzava =>
+      if (drzava != null)
       {
         var dto = mapper.Map<Drzava, DrzavaDto>(drzava);
-        list.Add(dto);
-      });
-
-      return list;
-    }
-
-    private IQueryable<Drzava> PrepareDbQuuery(DrzavaQuery query)
-    {
-      var dbquery = ctx.Drzava
-                             .AsNoTracking();
-      if (!string.IsNullOrWhiteSpace(query.SearchText))
+        return dto;
+      }
+      else
       {
-        dbquery = dbquery.Where(d => d.NazDrzave.Contains(query.SearchText)
-                                  || d.Iso3drzave.Contains(query.SearchText)
-                                  || d.SifDrzave.ToString().Contains(query.SearchText)
-                                  || d.OznDrzave.Contains(query.SearchText));
+        return null;
       }
-
-      if (query.Sort != null && query.Sort.ColumnOrder.Count > 0)
-      {
-        var first = query.Sort.ColumnOrder[0];
-        var orderSelector = GetOrderSelector(first.Key);
-        if (orderSelector != null)
-        {
-          var orderedQuery = first.Value == SortInfo.Order.ASCENDING ?
-                       dbquery.OrderBy(orderSelector) :
-                       dbquery.OrderByDescending(orderSelector);
-
-          for (int i = 1; i < query.Sort.ColumnOrder.Count; i++)
-          {
-            var sort = query.Sort.ColumnOrder[i];
-            orderSelector = GetOrderSelector(sort.Key);
-            if (orderSelector != null)
-            {
-              orderedQuery = sort.Value == SortInfo.Order.ASCENDING ?
-                                 orderedQuery.ThenBy(orderSelector) :
-                                 orderedQuery.ThenByDescending(orderSelector);
-            }
-          }
-          dbquery = orderedQuery;
-        }
-      }
-
-      dbquery = dbquery.Skip(query.From).Take(query.Count);
-      return dbquery;
-    }  
-
-    private Expression<Func<Drzava, object>> GetOrderSelector(string columnName) {
-      Expression<Func<Drzava, object>> orderSelector = null;
-      switch (columnName) {
-        case nameof(DrzavaDto.SifDrzave):
-          orderSelector = d => d.SifDrzave;
-          break;
-        case nameof(DrzavaDto.OznDrzave):
-          orderSelector = d => d.OznDrzave;
-          break;
-        case nameof(DrzavaDto.NazDrzave):
-          orderSelector = d => d.NazDrzave;
-          break;
-        case nameof(DrzavaDto.Iso3drzave):
-          orderSelector = d => d.Iso3drzave;
-          break;
-      }
-      return orderSelector;
-    }
+    }    
   }
 }
