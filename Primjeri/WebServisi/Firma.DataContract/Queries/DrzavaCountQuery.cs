@@ -6,12 +6,9 @@ using System.Text;
 
 namespace Firma.DataContract.Queries
 {
-  public class DrzavaQuery : IQuery<IEnumerable<DrzavaDto>>
+  public class DrzavaCountQuery : IQuery<int>
   {
     public string SearchText { get; set; }
-    public int From { get; set; }
-    public int Count { get; set; }
-    public SortInfo Sort { get; set; }   
   }
   
 }

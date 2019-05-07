@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Firma.WebApi.Models.DataTables;
+using Firma.DataContract.Queries;
+using FCD.Admin.Models.DataTables;
 
 namespace Firma.WebApi.Controllers
 {
@@ -17,6 +20,7 @@ namespace Firma.WebApi.Controllers
   {
     private const string GetDrzavaRouteName = "DohvatiDrzavu"; //potrebno kod CreatedAtRoute    
     private readonly IDrzavaQueryHandler queryHandler;
+    private readonly IDrzavaCountQueryHandler drzavaCountQueryHandler;
     private readonly IMapper mapper;
 
     /// <summary>
@@ -24,9 +28,10 @@ namespace Firma.WebApi.Controllers
     /// </summary>
     /// <param name="queryHandler">query handler za dohvat država</param>
     /// <param name="mapper">AutoMapper objekt za preslikavanje među objektima različitih klasa</param>
-    public DrzavaController(IDrzavaQueryHandler queryHandler, IMapper mapper)
+    public DrzavaController(IDrzavaQueryHandler queryHandler, IDrzavaCountQueryHandler drzavaCountQueryHandler, IMapper mapper)
     {            
       this.queryHandler = queryHandler;
+      this.drzavaCountQueryHandler = drzavaCountQueryHandler;
       this.mapper = mapper;
     }
 
@@ -37,14 +42,57 @@ namespace Firma.WebApi.Controllers
     /// <returns>Popis svih država sortiran po nazivu država</returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Drzava>), (int)HttpStatusCode.OK)]
-    public IEnumerable<Drzava> Get()
+    public async Task<DTResponse> Get(DTRequest request)
     {
-      var data = queryHandler.Handle(new DataContract.Queries.DrzavaQuery());
+      var query = new DrzavaQuery();
+      if (request.Search != null)
+      {
+        query.SearchText = request.Search.Value.Trim();
+      }
+
+      SortInfo sortInfo = request.GetSortInfo();
+      if (sortInfo != null && sortInfo.ColumnOrder != null && sortInfo.ColumnOrder.Count > 0)
+      {
+        var keyMappings = new Dictionary<string, string> {
+          { nameof(Drzava.Iso3drzave).ToLower(), nameof(DrzavaDto.Iso3drzave) },
+          { nameof(Drzava.NazDrzave).ToLower(), nameof(DrzavaDto.NazDrzave) },
+          { nameof(Drzava.SifDrzave).ToLower(), nameof(DrzavaDto.SifDrzave) },
+          { nameof(Drzava.OznDrzave).ToLower(), nameof(DrzavaDto.OznDrzave) }
+        };
+        query.Sort = new SortInfo();
+
+        foreach (var sort in sortInfo.ColumnOrder)
+        {
+          if (keyMappings.TryGetValue(sort.Key.ToLower(), out string dtokey))
+          {
+            query.Sort.ColumnOrder.Add(new KeyValuePair<string, SortInfo.Order>(dtokey, sort.Value));
+          }
+        }
+      }
+
+      query.From = request.Start;
+      query.Count = request.Length;
+     
+      List<Drzava> list = new List<Drzava>();
+      var data = queryHandler.Handle(query);
       foreach (var drzava in data)
       {
-        yield return mapper.Map<DrzavaDto, Drzava>(drzava);
+        list.Add(mapper.Map<DrzavaDto, Drzava>(drzava));
       }
-      //return data;
+
+      int totalRecords = await drzavaCountQueryHandler.HandleAsync(new DrzavaCountQuery());
+      int totalFiltered = await drzavaCountQueryHandler.HandleAsync(new DrzavaCountQuery() { SearchText = query.SearchText });
+      var response = new DTResponse()
+      {
+        recordsFiltered = totalFiltered,
+        recordsTotal = totalRecords,
+        data = list.ToArray(),
+        draw = request.Draw
+      };
+
+      
+
+      return response;
     }
 /*
     // GET api/drzava/HR

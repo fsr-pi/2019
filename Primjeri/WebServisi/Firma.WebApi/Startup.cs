@@ -39,7 +39,8 @@ namespace Firma.WebApi
       #region query handler setup
       //umjesto repetitvnog pisanja može se riješiti refleksijom tražeći i registrirajući sve handlere (klase koje implementiraju neki IQueryHandler<,>)
       //iz typeof(ArtiklQueryHandler).Assembly
-      services.AddTransient<IDrzavaQueryHandler, DrzavaQueryHandler>();     
+      services.AddTransient<IDrzavaQueryHandler, DrzavaQueryHandler>();
+      services.AddTransient<IDrzavaCountQueryHandler, DrzavaCountQueryHandler>();
       #endregion
 
       services.AddAutoMapper(typeof(Startup));

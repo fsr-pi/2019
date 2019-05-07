@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Pregled svih država</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        Podaci u tablici dobiveni su pozivom web servisa na adresi <a href="/api/drzava" target="_blank">/api/drzava</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+        <h2>Pregled država</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+        <table id="example" class="table table-condensed table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Oznaka</th>
+              <th>Naziv</th>
+              <th>ISO3 oznaka</th>
+              <th>Šifra države</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+
+  <script type="text/javascript">
+    var tableLangSettings = {
+      search: "Pretraga",
+      info: "_START_ - _END_ od ukupno _TOTAL_ zapisa",
+      lengthMenu: "Prikaži _MENU_ zapisa",
+      paginate: {
+        first: "Prva",
+        previous: "Prethodna",
+        next: "Sljedeća",
+        last: "Zadnja"
+      },
+      emptyTable: "Nema podataka za prikaz",
+      infoEmpty: "Nema podataka za prikaz",
+      infoFiltered: "(filtrirano od ukupno _MAX_ zapisa)",
+      zeroRecords: "Ne postoje traženi podaci"
+    };
+
+    $(document).ready(function () {
+      $('#example').DataTable({
+        language: tableLangSettings,
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        paging: true,
+        searching: true,
+        ajax: "api/drzava",
+        columns: [
+          { "data": "oznDrzave" },
+          { "data": "nazDrzave" },
+          { "data": "sifDrzave" },
+          { "data": "iso3drzave" }          
+        ]
+      });
+    });
+  </script>
+
+</body>
+</html>

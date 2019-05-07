@@ -24,4 +24,8 @@
     <ProjectReference Include="..\Firma.DAL\Firma.DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\drzave.html" />
+  </ItemGroup>
+
 </Project>
