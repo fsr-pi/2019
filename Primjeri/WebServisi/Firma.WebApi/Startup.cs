@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using CommandQueryCore;
+using FCD.WebApi.Util.ServiceFilters;
 using Firma.DAL.CommandHandlers;
 using Firma.DAL.Models;
 using Firma.DAL.QueryHandlers;
@@ -53,6 +54,8 @@ namespace Firma.WebApi
       services.AddTransient<ICommandHandler<UpdateDrzava>, DrzavaCommandHandler>();
       #endregion
 
+      services.AddScoped<BadRequestOnException>();
+
       services.AddAutoMapper(typeof(Startup));
 
       #region Swagger setup     
@@ -62,7 +65,7 @@ namespace Firma.WebApi
 
         c.SwaggerDoc("v1", new Info
         {
-          Title = "Firma.Mvc API",
+          Title = "Firma.WebApi",
           Description = "Jednostan primjer Web API-a nad državama",
           Version = "v1"
         });
@@ -96,7 +99,7 @@ namespace Firma.WebApi
       // specifying the Swagger JSON endpoint.
       app.UseSwaggerUI(c =>
       {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Firma.Mvc API V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Firma.WebApi V1");
         c.RoutePrefix = string.Empty;
       });      
       #endregion

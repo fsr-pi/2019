@@ -13,11 +13,13 @@ using Firma.DataContract.Queries;
 using FCD.Admin.Models.DataTables;
 using CommandQueryCore;
 using Firma.DataContract.Commands;
+using FCD.WebApi.Util.ServiceFilters;
 
 namespace Firma.WebApi.Controllers
 {
   [Route("api/[controller]")]
   [ApiController]
+  [ServiceFilter(typeof(BadRequestOnException))]
   public class DrzavaController : ControllerBase
   {
     private const string GetDrzavaRouteName = "DohvatiDrzavu"; //potrebno kod CreatedAtRoute    
@@ -139,7 +141,8 @@ namespace Firma.WebApi.Controllers
     [HttpGet("{oznDrzave}", Name = GetDrzavaRouteName)]
     [ProducesResponseType(typeof(Drzava), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
-    public async Task<IActionResult> Get(string oznDrzave)
+    //public async Task<IActionResult> Get(string oznDrzave)
+    public async Task<ActionResult<Drzava>> Get(string oznDrzave)
     {
       var drzava = await drzavaHandler.HandleAsync(new DrzavaQuery(oznDrzave));
       if (drzava == null)
