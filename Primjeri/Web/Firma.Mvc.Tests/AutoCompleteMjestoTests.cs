@@ -40,7 +40,7 @@ namespace Firma.Mvc.Tests
       {
         AutoCompleteCount = appSection.GetValue<int>("AutoCompleteCount") //ostali argumenti su nebitni za ovu grupu testova
       };
-      mockOptions.SetupGet(appsettings => appsettings.Value).Returns(appSettings);
+      mockOptions.SetupGet(options => options.Value).Returns(appSettings);
       options = mockOptions.Object;      
     }
 

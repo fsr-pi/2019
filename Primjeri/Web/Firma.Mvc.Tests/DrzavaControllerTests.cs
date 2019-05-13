@@ -28,7 +28,7 @@ namespace Firma.Mvc.Tests
       {
         PageSize = 10 //ostali argumenti su nebitni za ovu grupu testova
       };
-      mockOptions.SetupGet(appsettings => appsettings.Value).Returns(appSettings);
+      mockOptions.SetupGet(options => options.Value).Returns(appSettings);
       options = mockOptions.Object;
 
       //logger se imitira u pojedinom testu, jer svaki put treba biti novi objekt
